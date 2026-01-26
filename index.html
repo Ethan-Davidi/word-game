@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Word Picker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <div class="stats">
+        <span id="score">Score: 0</span>
+        <span id="streak">Streak: 0</span>
+      </div>
+      <label class="tts">
+        <input id="ttsToggle" type="checkbox" />
+        Voice
+      </label>
+    </header>
+
+    <section class="card">
+      <div class="wordRow">
+        <h1 id="word">word</h1>
+        <button id="speakBtn" type="button" aria-label="Speak word">🔊</button>
+      </div>
+      <p id="feedback" class="feedback"></p>
+
+      <div id="grid" class="grid"></div>
+
+      <button id="nextBtn" class="next" type="button" disabled>Next</button>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
