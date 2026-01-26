@@ -1,11 +1,7 @@
 const $ = (id) => document.getElementById(id);
 
-let score = 0;
-let streak = 0;
-let currentIndex = 0;
-let locked = false;
-
-const STORAGE_KEY = "wordGameProgress_v1";
+// ---- Local storage (optional progress history per word) ----
+const STORAGE_KEY = "wordGameProgress_v2";
 
 function loadProgress() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -20,6 +16,7 @@ function saveWordResult(word, ok) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
+// ---- Helpers ----
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -37,34 +34,73 @@ function speakWord(word) {
   window.speechSynthesis.speak(u);
 }
 
-function renderStats() {
-  $("score").textContent = `Score: ${score}`;
-  $("streak").textContent = `Streak: ${streak}`;
-}
-
 function setFeedback(text) {
   $("feedback").textContent = text;
 }
 
-function renderQuestion() {
-  locked = false;
-  $("nextBtn").disabled = true;
+function setFinalVisible(isVisible) {
+  $("finalPanel").classList.toggle("hidden", !isVisible);
+}
+
+// ---- Game state ----
+// Flow rules you requested:
+// - Start with words never shown (unseen) => we do this by shuffling once and taking from front
+// - If wrong, word comes back later
+// - If correct, remove forever
+// - Game ends only when all words are correct
+let queue = [];                 // items are {word, img}
+let current = null;             // current item
+let locked = false;
+
+let attempts = 0;               // number of questions asked (attempts)
+let masteredCount = 0;          // number of unique words mastered in this run
+let totalWords = 0;             // total words this run
+
+function renderStats() {
+  $("attempts").textContent = `Attempts: ${attempts}`;
+  $("mastered").textContent = `Mastered: ${masteredCount}/${totalWords}`;
+}
+
+function buildChoices(correctItem) {
+  // Need 3 distractors from the full WORDS list (excluding correct word)
+  const pool = WORDS.filter(w => w.word !== correctItem.word);
+  const distractors = shuffle(pool).slice(0, 3);
+
+  return shuffle([
+    { img: correctItem.img, correct: true },
+    ...distractors.map(d => ({ img: d.img, correct: false }))
+  ]);
+}
+
+function showEndScreen() {
+  setFinalVisible(true);
+  $("grid").innerHTML = "";
+  $("word").textContent = "Done!";
   setFeedback("");
 
-  const correct = WORDS[currentIndex % WORDS.length];
-  $("word").textContent = correct.word;
+  // Your scoring definition:
+  // correct answers at end = number of words
+  // out of number of question asked = attempts
+  $("finalScore").textContent =
+    `Score: ${totalWords} / ${attempts} (words mastered / attempts)`;
+}
 
-  // pick 3 random wrong images
-  const others = WORDS
-    .filter(w => w.word !== correct.word)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 3);
+function nextWord() {
+  locked = false;
+  $("nextBtn").disabled = true;
+  setFinalVisible(false);
+  setFeedback("");
 
-  const choices = shuffle([
-    { img: correct.img, correct: true },
-    ...others.map(o => ({ img: o.img, correct: false }))
-  ]);
+  if (queue.length === 0) {
+    showEndScreen();
+    return;
+  }
 
+  current = queue.shift(); // take next unseen-or-returned word
+
+  $("word").textContent = current.word;
+
+  const choices = buildChoices(current);
   const grid = $("grid");
   grid.innerHTML = "";
 
@@ -78,45 +114,74 @@ function renderQuestion() {
     img.alt = "choice";
     btn.appendChild(img);
 
-    btn.addEventListener("click", () =>
-      onPick(btn, c.correct, correct.word)
-    );
-
+    btn.addEventListener("click", () => onPick(btn, c.correct));
     grid.appendChild(btn);
   }
+
+  renderStats();
+
+  // Optional: auto-speak when voice enabled (but only if you click Speak; safer for browsers)
+  // If you want auto-speak on each new word, uncomment this:
+  // if ($("ttsToggle").checked) speakWord(current.word);
 }
 
-
-function onPick(btn, isCorrect, word) {
+function onPick(btn, isCorrect) {
   if (locked) return;
   locked = true;
 
+  attempts += 1;
+
   if (isCorrect) {
-    score += 1;
-    streak += 1;
     btn.classList.add("correct");
     setFeedback("✅ Correct!");
+    masteredCount += 1;
+    saveWordResult(current.word, true);
+    // Correct words are NOT re-added: removed forever (your requirement)
   } else {
-    streak = 0;
     btn.classList.add("wrong");
-    setFeedback("❌ Try the next one!");
+    setFeedback("❌ Try again later!");
+    saveWordResult(current.word, false);
+
+    // Wrong words go back into the queue to be asked again later
+    queue.push(current);
   }
 
-  saveWordResult(word, isCorrect);
   renderStats();
   $("nextBtn").disabled = false;
 }
 
+// ---- Buttons ----
 $("nextBtn").addEventListener("click", () => {
-  currentIndex += 1;
-  renderQuestion();
+  nextWord();
 });
 
 $("speakBtn").addEventListener("click", () => {
   if ($("ttsToggle").checked) speakWord($("word").textContent);
 });
 
-// Init
-renderStats();
-renderQuestion();
+$("restartBtn").addEventListener("click", () => {
+  startNewGame();
+});
 
+// ---- Init / start ----
+function startNewGame() {
+  if (!Array.isArray(WORDS) || WORDS.length < 4) {
+    alert("WORDS must exist and contain at least 4 items.");
+    return;
+  }
+
+  // Shuffle once so we show “never presented” words first in random order.
+  queue = shuffle(WORDS);
+
+  current = null;
+  locked = false;
+
+  attempts = 0;
+  masteredCount = 0;
+  totalWords = WORDS.length;
+
+  renderStats();
+  nextWord();
+}
+
+startNewGame();
