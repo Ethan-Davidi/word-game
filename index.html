@@ -10,9 +10,10 @@
   <main class="app">
     <header class="top">
       <div class="stats">
-        <span id="score">Score: 0</span>
-        <span id="streak">Streak: 0</span>
+        <span id="attempts">Attempts: 0</span>
+        <span id="mastered">Mastered: 0/0</span>
       </div>
+
       <label class="tts">
         <input id="ttsToggle" type="checkbox" />
         Voice
@@ -24,11 +25,18 @@
         <h1 id="word">word</h1>
         <button id="speakBtn" type="button" aria-label="Speak word">🔊</button>
       </div>
+
       <p id="feedback" class="feedback"></p>
 
       <div id="grid" class="grid"></div>
 
       <button id="nextBtn" class="next" type="button" disabled>Next</button>
+
+      <div id="finalPanel" class="final hidden" aria-live="polite">
+        <h2>🎉 Finished!</h2>
+        <p id="finalScore"></p>
+        <button id="restartBtn" class="next" type="button">Play again</button>
+      </div>
     </section>
   </main>
 
