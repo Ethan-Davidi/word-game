@@ -1,8 +1,10 @@
 :root { font-family: system-ui, Arial, sans-serif; }
 body { margin: 0; background: #f6f7fb; }
 .app { max-width: 720px; margin: 0 auto; padding: 16px; }
+
 .top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-.stats { display:flex; gap:12px; font-weight:600; }
+.stats { display:flex; gap:12px; font-weight:600; flex-wrap: wrap; }
+
 .card {
   margin-top: 12px;
   background: white;
@@ -10,11 +12,23 @@ body { margin: 0; background: #f6f7fb; }
   padding: 16px;
   box-shadow: 0 8px 24px rgba(0,0,0,.08);
 }
+
 .wordRow { display:flex; justify-content:space-between; align-items:center; gap:12px; }
 #word { font-size: 48px; margin: 8px 0; }
-#speakBtn { font-size: 24px; padding: 10px 14px; border-radius: 12px; border: 1px solid #ddd; background: #fff; }
+
+#speakBtn {
+  font-size: 24px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+
 .feedback { min-height: 28px; font-size: 20px; font-weight: 700; margin: 8px 0 14px; }
+
 .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
 .choice {
   border: 2px solid #eee;
   border-radius: 16px;
@@ -24,9 +38,12 @@ body { margin: 0; background: #f6f7fb; }
   aspect-ratio: 1/1;
   cursor:pointer;
 }
+
 .choice img { max-width: 90%; max-height: 90%; }
+
 .choice.correct { border-color: #30c85a; }
 .choice.wrong { border-color: #ff4d4d; }
+
 .next {
   width: 100%;
   margin-top: 14px;
@@ -38,5 +55,17 @@ body { margin: 0; background: #f6f7fb; }
   color: white;
   cursor:pointer;
 }
+
 .next:disabled { opacity: .4; cursor:not-allowed; }
+
 .tts { display:flex; align-items:center; gap:8px; font-weight:600; }
+
+.final {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 2px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.hidden { display: none; }
