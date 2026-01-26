@@ -51,13 +51,23 @@ function renderQuestion() {
   $("nextBtn").disabled = true;
   setFeedback("");
 
-  const q = QUESTIONS[currentIndex % QUESTIONS.length];
-  $("word").textContent = q.word;
+  const correct = WORDS[currentIndex % WORDS.length];
+  $("word").textContent = correct.word;
+
+  // pick 3 random wrong images
+  const others = WORDS
+    .filter(w => w.word !== correct.word)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3);
+
+  const choices = shuffle([
+    { img: correct.img, correct: true },
+    ...others.map(o => ({ img: o.img, correct: false }))
+  ]);
 
   const grid = $("grid");
   grid.innerHTML = "";
 
-  const choices = shuffle(q.choices);
   for (const c of choices) {
     const btn = document.createElement("button");
     btn.className = "choice";
@@ -68,10 +78,14 @@ function renderQuestion() {
     img.alt = "choice";
     btn.appendChild(img);
 
-    btn.addEventListener("click", () => onPick(btn, c.correct, q.word));
+    btn.addEventListener("click", () =>
+      onPick(btn, c.correct, correct.word)
+    );
+
     grid.appendChild(btn);
   }
 }
+
 
 function onPick(btn, isCorrect, word) {
   if (locked) return;
@@ -105,3 +119,4 @@ $("speakBtn").addEventListener("click", () => {
 // Init
 renderStats();
 renderQuestion();
+
