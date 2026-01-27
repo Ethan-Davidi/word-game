@@ -15,7 +15,7 @@ const WORDS = [
   { word: "test",    img: "img/test.png" },
   { word: "today",   img: "img/today.png" },
   { word: "lesson",  img: "img/lesson.png" },
-  { word: "grade",   img: "img/grade.png" },
+
   { word: "world",   img: "img/world.png" },
   { word: "country", img: "img/country.png" },
   { word: "city",    img: "img/city.png" },
@@ -27,3 +27,4 @@ const WORDS = [
   { word: "cat",     img: "img/cat.png" },
   { word: "apple",   img: "img/apple.png" }
 ];
+
