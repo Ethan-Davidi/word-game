@@ -1,5 +1,5 @@
 // Picture filenames MUST match the word exactly.
-// Put images in /img and name them like: bridge.png, palace.png, fish.png, ...
+// Put images in /img and name them like: apple.png, cat.png, fish.png, ...
 
 const WORDS = [
   { word: "bridge",  img: "img/bridge.png" },
@@ -22,5 +22,8 @@ const WORDS = [
   { word: "farm",    img: "img/farm.png" },
   { word: "gate",    img: "img/gate.png" },
   { word: "trip",    img: "img/trip.png" },
-  { word: "fish",    img: "img/fish.png" }
+
+  { word: "fish",    img: "img/fish.png" },
+  { word: "cat",     img: "img/cat.png" },
+  { word: "apple",   img: "img/apple.png" }
 ];
