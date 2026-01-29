@@ -69,3 +69,25 @@ body { margin: 0; background: #f6f7fb; }
 }
 
 .hidden { display: none; }
+
+/* Hebrew RTL alignment */
+.hebrew {
+  direction: rtl;
+  text-align: right;
+  unicode-bidi: plaintext;
+}
+
+.finalScoreLine { font-weight: 700; margin: 8px 0 12px; }
+
+.practiceBlock { margin-top: 8px; }
+.practiceTitle { margin: 0 0 6px; font-weight: 700; }
+
+.practiceList {
+  margin: 0;
+  padding-right: 18px; /* RTL bullet indent */
+  padding-left: 0;
+}
+
+.practiceList li { margin: 4px 0; font-size: 18px; }
+
+.perfectRun { margin: 10px 0 0; font-weight: 700; }
