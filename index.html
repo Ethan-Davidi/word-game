@@ -26,15 +26,24 @@
         <button id="speakBtn" type="button" aria-label="Speak word">🔊</button>
       </div>
 
-      <p id="feedback" class="feedback"></p>
+      <p id="feedback" class="feedback hebrew" dir="rtl"></p>
 
       <div id="grid" class="grid"></div>
 
       <button id="nextBtn" class="next" type="button" disabled>Next</button>
 
-      <div id="finalPanel" class="final hidden" aria-live="polite">
-        <h2>🎉 Finished!</h2>
-        <p id="finalScore"></p>
+      <div id="finalPanel" class="final hidden hebrew" dir="rtl" aria-live="polite">
+        <h2>🎉 סיימנו!</h2>
+
+        <p id="finalScoreLine" class="finalScoreLine"></p>
+
+        <div id="practiceBlock" class="practiceBlock hidden">
+          <p class="practiceTitle">מילים שכדאי לתרגל שוב:</p>
+          <ul id="practiceList" class="practiceList"></ul>
+        </div>
+
+        <p id="perfectRun" class="perfectRun hidden">אלופה! בלי טעויות 🎉</p>
+
         <button id="restartBtn" class="next" type="button">Play again</button>
       </div>
     </section>
