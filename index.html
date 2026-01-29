@@ -9,14 +9,14 @@
 <body>
   <main class="app">
     <header class="top">
-      <div class="stats">
-        <span id="attempts">Attempts: 0</span>
-        <span id="mastered">Mastered: 0/0</span>
+      <div class="stats hebrew" dir="rtl">
+        <span id="attempts">ניסיונות: 0</span>
+        <span id="mastered">נלמדו: 0/0</span>
       </div>
 
-      <label class="tts">
+      <label class="tts hebrew" dir="rtl">
         <input id="ttsToggle" type="checkbox" />
-        Voice
+        קול
       </label>
     </header>
 
@@ -30,7 +30,7 @@
 
       <div id="grid" class="grid"></div>
 
-      <button id="nextBtn" class="next" type="button" disabled>Next</button>
+      <button id="nextBtn" class="next" type="button" disabled>הבא</button>
 
       <div id="finalPanel" class="final hidden hebrew" dir="rtl" aria-live="polite">
         <h2>🎉 סיימנו!</h2>
@@ -44,7 +44,7 @@
 
         <p id="perfectRun" class="perfectRun hidden">אלופה! בלי טעויות 🎉</p>
 
-        <button id="restartBtn" class="next" type="button">Play again</button>
+        <button id="restartBtn" class="next" type="button">שחקי שוב</button>
       </div>
     </section>
   </main>
