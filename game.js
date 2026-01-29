@@ -1,7 +1,7 @@
 const $ = (id) => document.getElementById(id);
 
 // ---- Local storage (optional progress history per word) ----
-const STORAGE_KEY = "wordGameProgress_v2";
+const STORAGE_KEY = "wordGameProgress_v4";
 
 function loadProgress() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -43,18 +43,16 @@ function setFinalVisible(isVisible) {
 }
 
 // ---- Game state ----
-// Flow rules you requested:
-// - Start with words never shown (unseen) => we do this by shuffling once and taking from front
-// - If wrong, word comes back later
-// - If correct, remove forever
-// - Game ends only when all words are correct
-let queue = [];                 // items are {word, img}
-let current = null;             // current item
+let queue = [];                 
+let current = null;             
 let locked = false;
 
-let attempts = 0;               // number of questions asked (attempts)
-let masteredCount = 0;          // number of unique words mastered in this run
-let totalWords = 0;             // total words this run
+let attempts = 0;               
+let masteredCount = 0;          
+let totalWords = 0;             
+
+// Track words that were ever missed
+let missedWords = new Set();    
 
 function renderStats() {
   $("attempts").textContent = `Attempts: ${attempts}`;
@@ -62,7 +60,6 @@ function renderStats() {
 }
 
 function buildChoices(correctItem) {
-  // Need 3 distractors from the full WORDS list (excluding correct word)
   const pool = WORDS.filter(w => w.word !== correctItem.word);
   const distractors = shuffle(pool).slice(0, 3);
 
@@ -75,14 +72,23 @@ function buildChoices(correctItem) {
 function showEndScreen() {
   setFinalVisible(true);
   $("grid").innerHTML = "";
-  $("word").textContent = "Done!";
+  $("word").textContent = "סיימנו!";
   setFeedback("");
 
-  // Your scoring definition:
-  // correct answers at end = number of words
-  // out of number of question asked = attempts
-  $("finalScore").textContent =
-    `Score: ${totalWords} / ${attempts} (words mastered / attempts)`;
+  const scoreLine =
+    `תוצאה: ${totalWords} / ${attempts} (מילים נכונות / ניסיונות)`;
+
+  const missedList = Array.from(missedWords).sort();
+
+  let missedLine;
+  if (missedList.length === 0) {
+    missedLine = "אלופה! בלי טעויות 🎉";
+  } else {
+    missedLine =
+      `מילים שכדאי לתרגל שוב: ${missedList.join(", ")}`;
+  }
+
+  $("finalScore").textContent = `${scoreLine}\n${missedLine}`;
 }
 
 function nextWord() {
@@ -96,8 +102,7 @@ function nextWord() {
     return;
   }
 
-  current = queue.shift(); // take next unseen-or-returned word
-
+  current = queue.shift();
   $("word").textContent = current.word;
 
   const choices = buildChoices(current);
@@ -119,10 +124,6 @@ function nextWord() {
   }
 
   renderStats();
-
-  // Optional: auto-speak when voice enabled (but only if you click Speak; safer for browsers)
-  // If you want auto-speak on each new word, uncomment this:
-  // if ($("ttsToggle").checked) speakWord(current.word);
 }
 
 function onPick(btn, isCorrect) {
@@ -133,16 +134,15 @@ function onPick(btn, isCorrect) {
 
   if (isCorrect) {
     btn.classList.add("correct");
-    setFeedback("✅ Correct!");
+    setFeedback("כל הכבוד! ✅");
     masteredCount += 1;
     saveWordResult(current.word, true);
-    // Correct words are NOT re-added: removed forever (your requirement)
   } else {
     btn.classList.add("wrong");
-    setFeedback("❌ Try again later!");
+    setFeedback("לא נורא, ננסה שוב 💪");
     saveWordResult(current.word, false);
 
-    // Wrong words go back into the queue to be asked again later
+    missedWords.add(current.word);
     queue.push(current);
   }
 
@@ -166,11 +166,10 @@ $("restartBtn").addEventListener("click", () => {
 // ---- Init / start ----
 function startNewGame() {
   if (!Array.isArray(WORDS) || WORDS.length < 4) {
-    alert("WORDS must exist and contain at least 4 items.");
+    alert("חייבות להיות לפחות 4 מילים במשחק");
     return;
   }
 
-  // Shuffle once so we show “never presented” words first in random order.
   queue = shuffle(WORDS);
 
   current = null;
@@ -179,6 +178,8 @@ function startNewGame() {
   attempts = 0;
   masteredCount = 0;
   totalWords = WORDS.length;
+
+  missedWords = new Set();
 
   renderStats();
   nextWord();
