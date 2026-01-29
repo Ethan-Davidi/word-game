@@ -1,7 +1,7 @@
 const $ = (id) => document.getElementById(id);
 
 // ---- Local storage (optional progress history per word) ----
-const STORAGE_KEY = "wordGameProgress_v4";
+const STORAGE_KEY = "wordGameProgress_v5";
 
 function loadProgress() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -42,17 +42,39 @@ function setFinalVisible(isVisible) {
   $("finalPanel").classList.toggle("hidden", !isVisible);
 }
 
+function showPracticeList(words) {
+  const block = $("practiceBlock");
+  const list = $("practiceList");
+  const perfect = $("perfectRun");
+
+  list.innerHTML = "";
+
+  if (words.length === 0) {
+    block.classList.add("hidden");
+    perfect.classList.remove("hidden");
+    return;
+  }
+
+  perfect.classList.add("hidden");
+  block.classList.remove("hidden");
+
+  for (const w of words) {
+    const li = document.createElement("li");
+    li.textContent = w;
+    list.appendChild(li);
+  }
+}
+
 // ---- Game state ----
-let queue = [];                 
-let current = null;             
+let queue = [];
+let current = null;
 let locked = false;
 
-let attempts = 0;               
-let masteredCount = 0;          
-let totalWords = 0;             
+let attempts = 0;
+let masteredCount = 0;
+let totalWords = 0;
 
-// Track words that were ever missed
-let missedWords = new Set();    
+let missedWords = new Set();
 
 function renderStats() {
   $("attempts").textContent = `Attempts: ${attempts}`;
@@ -75,26 +97,22 @@ function showEndScreen() {
   $("word").textContent = "סיימנו!";
   setFeedback("");
 
-  const scoreLine =
-    `תוצאה: ${totalWords} / ${attempts} (מילים נכונות / ניסיונות)`;
+  const scoreLine = `תוצאה: ${totalWords} / ${attempts} (מילים נכונות / ניסיונות)`;
+  $("finalScoreLine").textContent = scoreLine;
 
   const missedList = Array.from(missedWords).sort();
-
-  let missedLine;
-  if (missedList.length === 0) {
-    missedLine = "אלופה! בלי טעויות 🎉";
-  } else {
-    missedLine =
-      `מילים שכדאי לתרגל שוב: ${missedList.join(", ")}`;
-  }
-
-  $("finalScore").textContent = `${scoreLine}\n${missedLine}`;
+  showPracticeList(missedList);
 }
 
 function nextWord() {
   locked = false;
   $("nextBtn").disabled = true;
   setFinalVisible(false);
+
+  // hide end-panel sections for when game is running
+  $("practiceBlock").classList.add("hidden");
+  $("perfectRun").classList.add("hidden");
+
   setFeedback("");
 
   if (queue.length === 0) {
